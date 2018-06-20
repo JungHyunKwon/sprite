@@ -54,7 +54,7 @@ spriteFolder.forEach((directory, index, array) => {
 			spriteSmith.run({
 				src : files,
 				padding : 10,
-				algorithm: 'left-right',
+				algorithm: 'top-down',
 				algorithmOpts : {
 				  sort : false
 				}
