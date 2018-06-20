@@ -84,7 +84,7 @@ spriteFolder.forEach((directory, index, array) => {
 						console.log(distFolder + '에 폴더를 생성 하였습니다.');
 					}
 					
-					//기존에 만들어 놓은 sprite파일이 있을때
+					//png, json 파일 생성(./images/#/dist/)
 					fs.writeFileSync(fileName + '.png', result.image);
 					fs.writeFileSync(fileName + '.json', stringifyObject(result.coordinates));
 					console.log(distFolder + '에 생성하였습니다.');
