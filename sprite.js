@@ -7,10 +7,9 @@
 'use strict';
 
 const fs = require('fs'),
-	  isImage = require('is-image'),
 	  spriteSmith = require('spritesmith'),
-	  stringifyObject = require('stringify-object'),
-	  baseDirectory = './images/sprite';
+	  baseDirectory = './images/sprite',
+	  imageExtensions = ['ase', 'art', 'bmp', 'blp', 'cd5', 'cit', 'cpt', 'cr2', 'cut', 'dds', 'dib', 'djvu', 'egt', 'exif', 'gif', 'gpl', 'grf', 'icns', 'ico', 'iff', 'jng', 'jpeg', 'jpg', 'jfif', 'jp2', 'jps', 'lbm', 'max', 'miff', 'mng', 'msp', 'nitf', 'ota', 'pbm', 'pc1', 'pc2', 'pc3', 'pcf', 'pcx', 'pdn', 'pgm', 'PI1', 'PI2', 'PI3', 'pict', 'pct', 'pnm', 'pns', 'ppm', 'psb', 'psd', 'pdd', 'psp', 'px', 'pxm', 'pxr', 'qfx', 'raw', 'rle', 'sct', 'sgi', 'rgb', 'int', 'bw', 'tga', 'tiff', 'tif', 'vtf', 'xbm', 'xcf', 'xpm', '3dv', 'amf', 'ai', 'awg', 'cgm', 'cdr', 'cmx', 'dxf', 'e2d', 'egt', 'eps', 'fs', 'gbr', 'odg', 'svg', 'stl', 'vrml', 'x3d', 'sxd', 'v2d', 'vnd', 'wmf', 'emf', 'art', 'xar', 'png', 'webp', 'jxr', 'hdp', 'wdp', 'cur', 'ecw', 'iff', 'lbm', 'liff', 'nrrd', 'pam', 'pcx', 'pgf', 'sgi', 'rgb', 'rgba', 'bw', 'int', 'inta', 'sid', 'ras', 'sun', 'tga'];
 
 let spriteFolder = [];
 
@@ -32,17 +31,21 @@ spriteFolder.forEach((directory, index, array) => {
 	//폴더일때
 	if(fs.statSync(directory).isDirectory()) {
 		//조회(./images/sprite/#/#.#)
-		let files = fs.readdirSync(directory);
+		let files = fs.readdirSync(directory),
+			fileName = [];
 		
 		//조회된 파일, 폴더 수 만큼 반복
 		files.forEach((file, index, array) => {
+			let fileSplit = file.split('.');
+
 			//폴더경로와 파일명 합성(./images/sprite/#.#)
 			file = directory + '/' + file;
 			
-			//이미지 파일일때 파일경로 갱신
-			if(fs.statSync(file).isFile() && isImage(file)) {
+			//이미지 파일의 확장자를 가진 파일일때 파일경로, 파일명 입력
+			if(fs.statSync(file).isFile() && imageExtensions.indexOf(fileSplit[1])) {
 				files[index] = file;
-			
+				fileName.push(fileSplit[0]);
+
 			//아니면 배열 files에서 제거
 			}else{
 				files.splice(index, 1);
@@ -64,8 +67,11 @@ spriteFolder.forEach((directory, index, array) => {
 					console.error(error);
 				}else{
 					let distFolder = directory + '/' + 'dist', //폴더경로와 dist폴더명 합성(./images/sprite/#/dist)
-						fileName = distFolder + '/' + directoryName + '_sprite',
-						isDist = false;
+						spriteName = directoryName + '_sprite',
+						savePath = distFolder + '/' + spriteName,
+						isDist = false,
+						cssText = '@charset \'utf-8\';\n',
+						index = 0;
 					
 					try {
 						//변수 distFolder가 폴더일때
@@ -81,12 +87,45 @@ spriteFolder.forEach((directory, index, array) => {
 					//dist 폴더가 없을때 폴더생성
 					if(!isDist) {
 						fs.mkdirSync(distFolder);
-						console.log(distFolder + '에 폴더를 생성 하였습니다.');
+						//console.log(distFolder + '에 폴더를 생성 하였습니다.');
 					}
 					
-					//png, json 파일 생성(./images/#/dist/)
-					fs.writeFileSync(fileName + '.png', result.image);
-					fs.writeFileSync(fileName + '.json', stringifyObject(result.coordinates));
+					//png 파일 생성(./images/#/dist/)
+					fs.writeFileSync(savePath + '.png', result.image);
+
+					for(var i in result.coordinates) {
+						var coordinates = result.coordinates[i],
+							top = 'top',
+							left = 'left',
+							width = ''
+						
+						//x 좌표값이 있을때
+						if(coordinates.x) {
+							left = '-' + coordinates.x + 'px';
+						}
+						
+						//y 좌표값이 있을때
+						if(coordinates.y) {
+							top = '-' + coordinates.y + 'px';
+						}
+						
+						//넓이값이 있을때
+						if(coordinates.width) {
+							coordinates.width += 'px';
+						}
+						
+						//높이값이 있을때
+						if(coordinates.height) {
+							coordinates.height += 'px';
+						}
+
+						cssText += '\n.' + fileName[index] + ' {width:' + coordinates.width + '; height:' + coordinates.height + '; background:url(\'' + (spriteName + '.png') + '\') no-repeat ' + left + ' ' + top + ';}';
+						index++;
+					}
+					
+					//css 파일 생성(./images/#/dist/)
+					fs.writeFileSync(savePath + '.css', cssText);
+
 					console.log(distFolder + '에 생성하였습니다.');
 				}
 			});
