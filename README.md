@@ -14,7 +14,7 @@ node sprite.js
 ## 규칙
 1. sprite.js와 images폴더가 형제관계로 있어야 된다.
 2. images 폴더안에 sprite폴더가 존재해야 한다. 
-3. images 폴더안에 원하는 폴더명으로 폴더를 만든다.
+3. ./images/sprite/ 폴더안에 원하는 폴더명으로 폴더를 만든다.
 4. ./images/sprite/#/ 안에 이미지 파일의 파일명을 01.#, 02.#...으로 짓는다.
 
 ## 유지보수
