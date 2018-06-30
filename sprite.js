@@ -129,11 +129,11 @@ try {
 						//css 파일 생성(./images/#/dist/)
 						fs.writeFileSync(savePath + '.css', cssText);
 						console.log(distPath + '에 생성하였습니다.');
-
-						//다음 반복실행
-						index++;
-						loopSpriteFolder(index);
 					}
+
+					//다음 반복실행
+					index++;
+					loopSpriteFolder(index);
 				});
 			}else{
 				console.error(path + '에 이미지 파일이 없습니다.');
