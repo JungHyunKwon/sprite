@@ -21,9 +21,11 @@ try {
 	console.error(baseDirectory + '가 있는지 확인해주세요.');
 }
 
+let spriteFolderLength = spriteFolder.length;
+
 //조회된 파일, 폴더 수 만큼 반복
 (function loopSpriteFolder() {
-	if(spriteFolder.length > index) {
+	if(spriteFolderLength > index) {
 		//폴더명
 		let path = spriteFolder[index],
 			directoryName = path;
@@ -84,7 +86,7 @@ try {
 						
 						//변수 distFolder에 dist폴더가 없으면 오류발생
 						}catch(e) {
-							//console.log(distPath + '에 폴더 생성 준비중입니다.');
+							//console.error(path + '에 dist폴더가 없습니다.');
 						}
 						
 						//dist 폴더가 없을때 폴더생성
@@ -139,7 +141,7 @@ try {
 				console.error(path + '에 이미지 파일이 없습니다.');
 			}
 		}else{
-			console.error(path + '폴더가 아닙니다.');
+			console.error(path + '가 폴더가 아닙니다.');
 		}
 	}
 })();
