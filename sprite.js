@@ -20,11 +20,9 @@ try {
 	console.error(baseDirectory + '가 있는지 확인해주세요.');
 }
 
-let spriteFolderLength = spriteFolder.length;
-
 //조회된 파일, 폴더 수 만큼 반복
 (function loopSpriteFolder(index) {
-	if(spriteFolderLength > index) {
+	if(spriteFolder.length > index) {
 		//폴더명
 		let path = spriteFolder[index],
 			directoryName = path;
