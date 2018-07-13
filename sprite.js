@@ -67,6 +67,10 @@ try {
 					//오류가 있을때
 					if(error) {
 						console.error(error);
+						
+						//다음 반복실행
+						index++;
+						loopSpriteFolder(index);
 					}else{
 						let distPath = path + '/' + 'dist', //폴더경로와 dist폴더명 합성(./images/sprite/#/dist)
 							spriteName = directoryName + '_sprite',
