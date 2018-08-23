@@ -69,8 +69,7 @@ try {
 						console.error(error);
 						
 						//다음 반복실행
-						index++;
-						loopSpriteFolder(index);
+						loopSpriteFolder(index + 1);
 					}else{
 						let distPath = path + '/' + 'dist', //폴더경로와 dist폴더명 합성(./images/sprite/#/dist)
 							spriteName = directoryName + '_sprite',
@@ -135,8 +134,7 @@ try {
 					}
 
 					//다음 반복실행
-					index++;
-					loopSpriteFolder(index);
+					loopSpriteFolder(index + 1);
 				});
 			}else{
 				console.error(path + '에 이미지 파일이 없습니다.');
