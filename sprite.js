@@ -56,6 +56,16 @@ try {
 			
 			//이미지 파일이 있을때
 			if(files.length) {
+				//숫자순으로 정렬
+				files = files.sort(function(a, b) {
+					a = a.split('/');
+					a = a[a.length - 1].split('.')[0];
+					b = b.split('/');
+					b = b[b.length - 1].split('.')[0];
+
+					return a - b;
+				});
+
 				spriteSmith.run({
 					src : files,
 					padding : 10,
