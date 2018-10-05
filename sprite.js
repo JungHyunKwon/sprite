@@ -20,6 +20,24 @@ try {
 	console.error(baseDirectory + '가 있는지 확인해주세요.');
 }
 
+/**
+ * @name 정렬
+ * @param {array} value
+ * @return {array}
+ * @since 2018-07-13
+ */
+function sort(value) {
+	//배열일때
+	return ((Array.isArray(value)) ? value : []).sort(function(a, b) {
+		a = a.split('/');
+		a = a[a.length - 1].split('.')[0];
+		b = b.split('/');
+		b = b[b.length - 1].split('.')[0];
+
+		return a - b;
+	});
+}
+
 //조회된 파일, 폴더 수 만큼 반복
 (function loopSpriteFolder(index) {
 	if(spriteFolder.length > index) {
@@ -57,14 +75,8 @@ try {
 			//이미지 파일이 있을때
 			if(files.length) {
 				//숫자순으로 정렬
-				files = files.sort(function(a, b) {
-					a = a.split('/');
-					a = a[a.length - 1].split('.')[0];
-					b = b.split('/');
-					b = b[b.length - 1].split('.')[0];
-
-					return a - b;
-				});
+				files = sort(files);
+				fileName = sort(fileName);
 
 				spriteSmith.run({
 					src : files,
