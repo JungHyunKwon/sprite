@@ -6,7 +6,7 @@ NodeJS로 만들었으며 스프라이트 이미지 생성을 도와주는 도�
 
 ## CLI
 ````javascript
-node sprite.js
+node sprite
 ````
 
 ## 패턴
