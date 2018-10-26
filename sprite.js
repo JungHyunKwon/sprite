@@ -155,9 +155,6 @@ try {
 					//오류가 있을 때
 					if(error) {
 						console.error(error);
-						
-						//다음 반복 실행
-						loopSpriteDirectory(index + 1);
 					}else{
 						let spriteWidth = result.properties.width,
 							spriteHeight = result.properties.height,
