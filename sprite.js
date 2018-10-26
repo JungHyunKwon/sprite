@@ -31,8 +31,8 @@ Array.prototype.compareNumbers = function() {
 
 /**
  * @name 소수점 절사
- * @param {array} value
- * @return {array}
+ * @param {number} decimal
+ * @return {number}
  * @since 2018-07-13
  */
 Number.prototype.toFixed = function(decimal) {
