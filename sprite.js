@@ -203,7 +203,7 @@ try {
 									original : x,
 									percent : percent.horizontal.position
 								},
-								size = percent.horizontal.size;
+								percentSize = percent.horizontal.size;
 							
 							//x 좌표값이 있을 때
 							if(x) {
@@ -286,10 +286,10 @@ try {
 							
 							//가로 크기와 세로 크기가 다를 때
 							if(percent.horizontal.size !== percent.vertical.size) {
-								size = percent.horizontal.size + ' ' + percent.vertical.size;
+								percentSize = percent.horizontal.size + ' ' + percent.vertical.size;
 							}
 
-							code.percent += '\n.' + filename + ' {' + position.percent + 'background-size:' + size + ';}';
+							code.percent += '\n.' + filename + ' {' + position.percent + 'background-size:' + percentSize + ';}';
 							
 							counter++;
 						}
