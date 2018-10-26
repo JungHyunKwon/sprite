@@ -188,8 +188,8 @@ try {
 						//png 파일 생성(./images/#/dist/)
 						fs.writeFileSync(saveDirectory + '.png', result.image);
 
-						for(var i in result.coordinates) {
-							var coordinates = result.coordinates[i],
+						for(let i in result.coordinates) {
+							let coordinates = result.coordinates[i],
 								width = coordinates.width,
 								height = coordinates.height,
 								x = coordinates.x,
