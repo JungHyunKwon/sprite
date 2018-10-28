@@ -188,7 +188,6 @@ try {
 						//png 파일 생성(./images/#/dist/)
 						fs.writeFileSync(saveDirectory + '.png', result.image);
 
-
 						for(let i in result.coordinates) {
 							let coordinates = result.coordinates[i],
 								percent = {
