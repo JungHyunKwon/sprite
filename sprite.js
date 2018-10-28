@@ -32,7 +32,7 @@ Array.prototype.compareNumbers = function() {
 /**
  * @name 소수점 절사
  * @param {number} decimal
- * @return {number}
+ * @return {string}
  * @since 2018-07-13
  */
 Number.prototype.toFixed = function(decimal) {
@@ -188,90 +188,64 @@ try {
 						//png 파일 생성(./images/#/dist/)
 						fs.writeFileSync(saveDirectory + '.png', result.image);
 
+
 						for(let i in result.coordinates) {
 							let coordinates = result.coordinates[i],
-								width = coordinates.width,
-								height = coordinates.height,
-								x = coordinates.x,
-								y = coordinates.y,
-								filename = filenames[counter],
 								percent = {
-									horizontal : calcSprite(spriteWidth, width, width, x).percent,
-									vertical : calcSprite(spriteHeight, height, height, y).percent
+									horizontal : calcSprite(spriteWidth, coordinates.width, coordinates.width, coordinates.x).percent,
+									vertical : calcSprite(spriteHeight, coordinates.height, coordinates.height, coordinates.y).percent
 								},
-								position = {
-									original : x,
-									percent : percent.horizontal.position
-								},
-								percentSize = percent.horizontal.size;
+								filename = filenames[counter];
 							
-							//x 좌표값이 있을 때
-							if(x) {
-								x = '-' + x + 'px';
+							//x 좌표값이 있을때
+							if(coordinates.x) {
+								coordinates.x = '-' + coordinates.x + 'px';
+							}else{
+								coordinates.x = 'left';
 							}
 							
-							//y 좌표값이 있을 때
-							if(y) {
-								y = '-' + y + 'px';
+							//y 좌표값이 있을때
+							if(coordinates.y) {
+								coordinates.y = '-' + coordinates.y + 'px';
+							}else{
+								coordinates.y = 'top';
 							}
 							
-							//x 좌표값과 y 좌표값이 다를 때
-							if(x !== y) {
-								//x 좌표값이 없을 때
-								if(!x) {
-									x = 'left';
-								}
-								
-								//y 좌표값이 없을 때
-								if(!y) {
-									y = 'top';
-								}
-
-								position.original = x + ' ' + y;
+							//넓이값이 있을때
+							if(coordinates.width) {
+								coordinates.width += 'px';
+							}
+							
+							//높이값이 있을때
+							if(coordinates.height) {
+								coordinates.height += 'px';
 							}
 
-							//넓이 값이 있을 때
-							if(width) {
-								width += 'px';
-							}
-							
-							//높이 값이 있을 때
-							if(height) {
-								height += 'px';
-							}
-							
-							code.original += '\n.' + filename + ' {width:' + width + '; height:' + height + '; background:url(\'' + (spriteName + '.png') + '\') no-repeat ' + position.original + ';}';
+							let position = coordinates.x + ' ' + coordinates.y;
 
-							//가로 위치가 있을 때
+							code.original += '\n.' + filename + ' {width:' + coordinates.width + '; height:' + coordinates.height + '; background:url(\'' + (spriteName + '.png') + '\') no-repeat ' + position + ';}';
+							
+							//x 좌표값이 있을때
 							if(percent.horizontal.position) {
 								percent.horizontal.position = parseFloat(percent.horizontal.position.toFixed(2), 10) + '%';
-							}
-							
-							//세로 위치가 있을 때
-							if(percent.vertical.position) {
-								percent.vertical.position = parseFloat(percent.vertical.position.toFixed(2) , 10) + '%';
-							}
-							
-							//가로 위치와 세로 위치가 다를 때
-							if(percent.horizontal.position !== percent.vertical.position) {
-								//x 좌표값이 없을 때
-								if(!percent.horizontal.position) {
-									percent.horizontal.position = 'left';
-								}
-								
-								//y 좌표값이 없을 때
-								if(!percent.vertical.position) {
-									percent.vertical.position = 'top';
-								}
-
-								position.percent = percent.horizontal.position + ' ' + percent.vertical.position;
-							}
-							
-							//원본 위치와 퍼센트 위치와 다를때
-							if(position.original === position.percent) {
-								position.percent = '';
 							}else{
-								position.percent = 'background-position:' + position.percent + '; ';
+								percent.horizontal.position = 'left';
+							}
+						
+							//y 좌표값이 있을때
+							if(percent.vertical.position) {
+								percent.vertical.position = parseFloat(percent.vertical.position.toFixed(2), 10) + '%';
+							}else{
+								percent.vertical.position = 'top';
+							}
+
+							percent.position = percent.horizontal.position + ' ' + percent.vertical.position;
+
+							//원본 위치와 퍼센트 위치와 같을 때
+							if(position === percent.position) {
+								percent.position = '';
+							}else{
+								percent.position = 'background-position:' + percent.position + '; ';
 							}
 
 							//가로 크기가 있을 때
@@ -284,19 +258,15 @@ try {
 								percent.vertical.size = parseFloat(percent.vertical.size.toFixed(2), 10) + '%';
 							}
 							
-							//가로 크기와 세로 크기가 다를 때
-							if(percent.horizontal.size !== percent.vertical.size) {
-								percentSize = percent.horizontal.size + ' ' + percent.vertical.size;
-							}
+							percent.size = percent.horizontal.size + ' ' + percent.vertical.size;
 
-							code.percent += '\n.' + filename + ' {' + position.percent + 'background-size:' + percentSize + ';}';
-							
+							code.percent += '\n.' + filename + ' {' + percent.position + 'background-size:' + percent.size + ';}';
+
 							counter++;
 						}
 
 						//css 파일 생성(./images/#/dist/)
-						code = code.original + code.percent;
-						fs.writeFileSync(saveDirectory + '.css', code);
+						fs.writeFileSync(saveDirectory + '.css', code.original + code.percent);
 
 						console.log(distDirectory + '에 생성하였습니다.');
 					}
