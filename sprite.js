@@ -20,10 +20,10 @@ const fs = require('fs'),
 Array.prototype.compareNumbers = function() {
 	return this.sort(function(a, b) {
 		a = a.split('/');
-		a = a[a.length - 1].split('.')[0];
+		a = parseInt(a[a.length - 1].split('.')[0], 10) || 0;
 
 		b = b.split('/');
-		b = b[b.length - 1].split('.')[0];
+		b = parseInt(b[b.length - 1].split('.')[0], 10) || 0;
 
 		return a - b;
 	});
