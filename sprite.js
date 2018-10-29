@@ -18,12 +18,15 @@ const fs = require('fs'),
  * @since 2018-07-13
  */
 Array.prototype.compareNumbers = function() {
+	let array = this,
+		arrayLength = array.length;
+
 	return this.sort(function(a, b) {
 		a = a.split('/');
-		a = parseInt(a[a.length - 1].split('.')[0], 10) || 0;
+		a = parseInt(a[a.length - 1].split('.')[0], 10) || arrayLength;
 
 		b = b.split('/');
-		b = parseInt(b[b.length - 1].split('.')[0], 10) || 0;
+		b = parseInt(b[b.length - 1].split('.')[0], 10) || arrayLength;
 
 		return a - b;
 	});
