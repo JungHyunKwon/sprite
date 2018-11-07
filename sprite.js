@@ -103,7 +103,7 @@ let spriteDirectory = [];
 // ./images/sprite 폴더 조회
 try {
 	spriteDirectory = fs.readdirSync(baseDirectory);
-}catch(error) {
+}catch(e) {
 	console.error(baseDirectory + '가 있는지 확인해주세요.');
 }
 
