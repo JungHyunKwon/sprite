@@ -112,7 +112,8 @@ try {
 	if(spriteDirectory.length > index) {
 		//폴더 이름
 		let directory = spriteDirectory[index],
-			directoryName = directory;
+			directoryName = directory,
+			isError = false;
 		
 		//기본 디렉토리와 폴더명과 합성(./images/sprite/#)
 		directory = baseDirectory + '/' + directoryName;
@@ -278,9 +279,17 @@ try {
 				});
 			}else{
 				console.error(directory + '에 이미지 파일이 없습니다.');
+				isError = true;
 			}
 		}else{
 			console.error(directory + '가 폴더가 아닙니다.');
+			isError = true;
+		}
+		
+		//오류가 있을 때
+		if(isError) {
+			//다음 반복 실행
+			loopSpriteDirectory(index + 1);
 		}
 	}
 })(0);
