@@ -50,7 +50,7 @@ function isInt(value) {
  * @since 2018-07-13
  */
 function toFixed(value, decimal) {
-	var result = NaN;
+	let result = NaN;
 	
 	//값이 정수일 때
 	if(isInt(value)) {
@@ -58,7 +58,7 @@ function toFixed(value, decimal) {
 		
 		//소수가 정수일 때
 		if(isInt(decimal)) {
-			var splitValue = value.toString().split('.'),
+			let splitValue = value.toString().split('.'),
 				splitValue1 = splitValue[1];
 			
 			//소수점이 있을 때
@@ -82,7 +82,7 @@ function toFixed(value, decimal) {
  * @return {object}
  */
 function calcSprite(size, from, to, position) {
-	var result = {
+	let result = {
 		pixel : {
 			size : 0,
 			position : 0
@@ -95,7 +95,7 @@ function calcSprite(size, from, to, position) {
 
 	//좌표가 정수이면서 나미저 변수들이 정수이면서 0 초과일 때
 	if(isInt(size) && size > 0 && isInt(from) && from > 0 && isInt(to) && to > 0 && isInt(position)) {
-		var ratio = from / to,
+		let ratio = from / to,
 			pixel = result.pixel,
 			pixelSize = size / ratio,
 			pixelPosition = position / ratio,
