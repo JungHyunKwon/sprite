@@ -34,7 +34,7 @@ function compareNumbers(value) {
 			return a - b;
 		});
 	}
-console.log(result);
+
 	return result;
 }
 
