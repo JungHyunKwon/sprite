@@ -33,21 +33,44 @@ Array.prototype.compareNumbers = function() {
 };
 
 /**
+ * @name 정수 확인
+ * @since 2017-12-06
+ * @param {*} value
+ * @return {boolean}
+ */
+function isInt(value) {
+	return typeof value === 'number' && !isNaN(value) && isFinite(value);
+}
+
+/**
  * @name 소수점 절사
+ * @param {number} value
  * @param {number} decimal
- * @return {string}
+ * @return {number}
  * @since 2018-07-13
  */
-Number.prototype.toFixed = function(decimal) {
-	let splitString = this.toString().split('.');
+function toFixed(value, decimal) {
+	var result = NaN;
 	
-	//소수점이 있을 때
-	if(splitString[1]) {
-		splitString[1] = splitString[1].substring(0, decimal);
+	//값이 정수일 때
+	if(isInt(value)) {
+		result = value;
+		
+		//소수가 정수일 때
+		if(isInt(decimal)) {
+			var splitValue = value.toString().split('.'),
+				splitValue1 = splitValue[1];
+			
+			//소수점이 있을 때
+			if(splitValue1) {
+				splitValue[1] = splitValue1.substring(0, decimal);
+				result = parseFloat(splitValue.join('.'), 10);
+			}
+		}
 	}
 
-	return splitString.join('.');
-};
+	return result;
+}
 
 /**
  * @name 스프라이트 계산
@@ -59,7 +82,7 @@ Number.prototype.toFixed = function(decimal) {
  * @return {object}
  */
 function calcSprite(size, from, to, position) {
-	let result = {
+	var result = {
 		pixel : {
 			size : 0,
 			position : 0
@@ -69,30 +92,19 @@ function calcSprite(size, from, to, position) {
 			position : 0
 		}
 	};
-	
-	//숫자형 변환
-	from = parseFloat(from, 10);
-	to = parseFloat(to, 10);
-	
-	//0초과일 때
-	if(from > 0 && to > 0) {
-		let ratio = from / to;
-		
-		size = parseFloat(size, 10);
 
-		//0초과일 때
-		if(size > 0) {
-			result.pixel.size = size / ratio;
-			result.percent.size = result.pixel.size / to * 100;
-		}
+	//좌표가 정수이면서 나미저 변수들이 정수이면서 0 초과일 때
+	if(isInt(size) && size > 0 && isInt(from) && from > 0 && isInt(to) && to > 0 && isInt(position)) {
+		var ratio = from / to,
+			pixel = result.pixel,
+			pixelSize = size / ratio,
+			pixelPosition = position / ratio,
+			percent = result.percent;
 
-		position = parseFloat(position, 10);
-
-		//NaN이 아니면서 Infinity가 아닐 때
-		if(position && position.toString().indexOf('Infinity') === -1) {
-			result.pixel.position = position / ratio;
-			result.percent.position = Math.abs(result.pixel.position / (result.pixel.size - to) * 100);
-		}
+		pixel.size = Math.round(pixelSize);
+		percent.size = toFixed(pixelSize / to * 100, 2);
+		pixel.position = Math.round(pixelPosition);
+		percent.position = toFixed(Math.abs(pixelPosition / (pixelSize - to) * 100), 2);
 	}
 
 	return result;
@@ -107,9 +119,11 @@ try {
 	console.error(baseDirectory + '가 있는지 확인해주세요.');
 }
 
+let spriteDirectoryLength = spriteDirectory.length;
+
 (function loopSpriteDirectory(index) {
 	//조회된 파일, 폴더 수만큼 반복
-	if(spriteDirectory.length > index) {
+	if(spriteDirectoryLength > index) {
 		//폴더 이름
 		let directory = spriteDirectory[index],
 			directoryName = directory,
@@ -160,16 +174,16 @@ try {
 					if(error) {
 						console.error(error);
 					}else{
-						let spriteWidth = result.properties.width,
-							spriteHeight = result.properties.height,
+						let coordinates = result.coordinates,
+							properties = result.properties,
+							spriteWidth = properties.width,
+							spriteHeight = properties.height,
 							distDirectory = directory + '/' + 'dist', //폴더 경로와 dist 폴더명 합성(./images/sprite/#/dist)
 							spriteName = directoryName + '_sprite',
 							saveDirectory = distDirectory + '/' + spriteName,
 							hasDistDirectory = false,
-							code = {
-								original : '@charset \'utf-8\';\n',
-								percent : '\n\n/* 가변 크기 */'
-							},
+							pixelCode = '@charset \'utf-8\';\n',
+							percentCode = '\n\n/* 가변 크기 */',
 							counter = 0;
 						
 						try {
@@ -192,84 +206,90 @@ try {
 						//png 파일 생성(./images/#/dist/)
 						fs.writeFileSync(saveDirectory + '.png', result.image);
 
-						for(let i in result.coordinates) {
-							let coordinates = result.coordinates[i],
-								percent = {
-									horizontal : calcSprite(spriteWidth, coordinates.width, coordinates.width, coordinates.x).percent,
-									vertical : calcSprite(spriteHeight, coordinates.height, coordinates.height, coordinates.y).percent
-								},
+						for(let i in coordinates) {
+							let coordinatesI = coordinates[i],
+								width = coordinatesI.width,
+								height = coordinatesI.height,
+								x = coordinatesI.x,
+								y = coordinatesI.y,
+								horizontalPercent = calcSprite(spriteWidth, width, width, x).percent,
+								horizontalPercentPosition = horizontalPercent.position,
+								horizontalPercentSize = horizontalPercent.size,
+								verticalPercent = calcSprite(spriteHeight, height, height, y).percent,
+								verticalPercentPosition = verticalPercent.position,
+								verticalPercentSize = verticalPercent.size,
 								filename = filenames[counter];
 							
 							//x 좌표값이 있을때
-							if(coordinates.x) {
-								coordinates.x = '-' + coordinates.x + 'px';
+							if(x) {
+								x = '-' + x + 'px';
 							}else{
-								coordinates.x = 'left';
+								x = 'left';
 							}
 							
 							//y 좌표값이 있을때
-							if(coordinates.y) {
-								coordinates.y = '-' + coordinates.y + 'px';
+							if(y) {
+								y = '-' + y + 'px';
 							}else{
-								coordinates.y = 'top';
+								y = 'top';
 							}
 							
+							let position = x + ' ' + y;
+
 							//넓이값이 있을때
-							if(coordinates.width) {
-								coordinates.width += 'px';
+							if(width) {
+								width += 'px';
 							}
 							
 							//높이값이 있을때
-							if(coordinates.height) {
-								coordinates.height += 'px';
+							if(height) {
+								height += 'px';
 							}
 
-							let position = coordinates.x + ' ' + coordinates.y;
-
-							code.original += '\n.' + filename + ' {width:' + coordinates.width + '; height:' + coordinates.height + '; background:url(\'' + (spriteName + '.png') + '\') no-repeat ' + position + ';}';
+							pixelCode += '\n.' + filename + ' {width:' + width + '; height:' + height + '; background:url(\'' + (spriteName + '.png') + '\') no-repeat ' + position + ';}';
 							
 							//x 좌표값이 있을때
-							if(percent.horizontal.position) {
-								percent.horizontal.position = parseFloat(percent.horizontal.position.toFixed(2), 10) + '%';
+							if(horizontalPercentPosition) {
+								horizontalPercentPosition = horizontalPercentPosition + '%';
 							}else{
-								percent.horizontal.position = 'left';
+								horizontalPercentPosition = 'left';
 							}
 						
 							//y 좌표값이 있을때
-							if(percent.vertical.position) {
-								percent.vertical.position = parseFloat(percent.vertical.position.toFixed(2), 10) + '%';
+							if(verticalPercentPosition) {
+								verticalPercentPosition = verticalPercentPosition + '%';
 							}else{
-								percent.vertical.position = 'top';
+								verticalPercentPosition = 'top';
 							}
 
-							percent.position = percent.horizontal.position + ' ' + percent.vertical.position;
+							let percentPosition = horizontalPercentPosition + ' ' + verticalPercentPosition;
 
 							//원본 위치와 퍼센트 위치와 같을 때
-							if(position === percent.position) {
-								percent.position = '';
+							if(position === percentPosition) {
+								percentPosition = '';
 							}else{
-								percent.position = 'background-position:' + percent.position + '; ';
+								percentPosition = 'background-position:' + percentPosition + '; ';
 							}
 
 							//가로 크기가 있을 때
-							if(percent.horizontal.size) {
-								percent.horizontal.size = parseFloat(percent.horizontal.size.toFixed(2), 10) + '%';
+							if(horizontalPercentSize) {
+								horizontalPercentSize = horizontalPercentSize + '%';
 							}
 							
 							//세로 크기가 있을 때
-							if(percent.vertical.size) {
-								percent.vertical.size = parseFloat(percent.vertical.size.toFixed(2), 10) + '%';
+							if(verticalPercentSize) {
+								verticalPercentSize = verticalPercentSize + '%';
 							}
 							
-							percent.size = percent.horizontal.size + ' ' + percent.vertical.size;
+							let percentSize = horizontalPercentSize + ' ' + verticalPercentSize;
 
-							code.percent += '\n.' + filename + ' {' + percent.position + 'background-size:' + percent.size + ';}';
+							percentCode += '\n.' + filename + ' {' + percentPosition + 'background-size:' + percentSize + ';}';
 
 							counter++;
 						}
 
 						//css 파일 생성(./images/#/dist/)
-						fs.writeFileSync(saveDirectory + '.css', code.original + code.percent);
+						fs.writeFileSync(saveDirectory + '.css', pixelCode + percentCode);
 
 						console.log(distDirectory + '에 생성하였습니다.');
 					}
