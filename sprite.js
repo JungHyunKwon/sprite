@@ -127,7 +127,8 @@ let spriteDirectoryLength = spriteDirectory.length;
 		//폴더 이름
 		let directory = spriteDirectory[index],
 			directoryName = directory,
-			isError = false;
+			isError = false,
+			nextIndex = index + 1;
 		
 		//기본 디렉토리와 폴더명과 합성(./images/sprite/#)
 		directory = baseDirectory + '/' + directoryName;
@@ -139,7 +140,7 @@ let spriteDirectoryLength = spriteDirectory.length;
 				filenames = [];
 			
 			//조회된 파일, 폴더 수 만큼 반복
-			files.forEach((value, index, array) => {
+			files.forEach((value, idx, array) => {
 				let splitValue = value.split('.');
 
 				//폴더경로와 파일명 합성(./images/sprite/#.#)
@@ -147,12 +148,12 @@ let spriteDirectoryLength = spriteDirectory.length;
 				
 				//이미지 파일의 확장자를 가진 파일일 때 파일경로, 파일명 입력
 				if(fs.statSync(value).isFile() && imageExtensions.indexOf(splitValue[1])) {
-					files[index] = value;
+					files[idx] = value;
 					filenames.push(splitValue[0]);
 
 				//아니면 배열 files에서 제거
 				}else{
-					files.splice(index, 1);
+					files.splice(idx, 1);
 				}
 			});
 			
@@ -295,7 +296,7 @@ let spriteDirectoryLength = spriteDirectory.length;
 					}
 
 					//다음 반복 실행
-					loopSpriteDirectory(index + 1);
+					loopSpriteDirectory(nextIndex);
 				});
 			}else{
 				console.error(directory + '에 이미지 파일이 없습니다.');
@@ -309,7 +310,7 @@ let spriteDirectoryLength = spriteDirectory.length;
 		//오류가 있을 때
 		if(isError) {
 			//다음 반복 실행
-			loopSpriteDirectory(index + 1);
+			loopSpriteDirectory(nextIndex);
 		}
 	}
 })(0);
