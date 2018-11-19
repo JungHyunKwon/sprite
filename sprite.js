@@ -17,20 +17,26 @@ const fs = require('fs'),
  * @return {array}
  * @since 2018-07-13
  */
-Array.prototype.compareNumbers = function() {
-	let array = this,
-		arrayLength = array.length;
+function compareNumbers(value) {
+	var result = [];
+	
+	//배열일 때
+	if(Array.isArray(value)) {
+		let valueLength = value.length;
 
-	return this.sort(function(a, b) {
-		a = a.split('/');
-		a = parseInt(a[a.length - 1].split('.')[0], 10) || arrayLength;
+		result = value.slice().sort(function(a, b) {
+			a = a.split('/');
+			a = parseInt(a[a.length - 1].split('.')[0], 10) || valueLength;
 
-		b = b.split('/');
-		b = parseInt(b[b.length - 1].split('.')[0], 10) || arrayLength;
+			b = b.split('/');
+			b = parseInt(b[b.length - 1].split('.')[0], 10) || valueLength;
 
-		return a - b;
-	});
-};
+			return a - b;
+		});
+	}
+console.log(result);
+	return result;
+}
 
 /**
  * @name 정수 확인
@@ -160,8 +166,8 @@ let spriteDirectoryLength = spriteDirectory.length;
 			//이미지 파일이 있을 때
 			if(files.length) {
 				//숫자 순으로 정렬
-				files = files.compareNumbers();
-				filenames = filenames.compareNumbers();
+				files = compareNumbers(files);
+				filenames = compareNumbers(filenames);
 
 				spriteSmith.run({
 					src : files,
