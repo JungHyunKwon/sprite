@@ -18,7 +18,7 @@ const fs = require('fs'),
  * @since 2018-07-13
  */
 function compareNumbers(value) {
-	var result = [];
+	let result = [];
 	
 	//배열일 때
 	if(Array.isArray(value)) {
