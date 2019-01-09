@@ -189,7 +189,7 @@ let spriteDirectoryLength = spriteDirectory.length;
 							spriteName = directoryName + '_sprite',
 							saveDirectory = distDirectory + '/' + spriteName,
 							hasDistDirectory = false,
-							pixelCode = '@charset \'utf-8\';\n',
+							pixelCode = '@charset "utf-8";\n',
 							percentCode = '\n\n/* 가변 크기 */',
 							counter = 0;
 						
