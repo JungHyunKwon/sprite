@@ -49,7 +49,7 @@ function isNumber(value) {
 }
 
 /**
- * @name 소수점 절사
+ * @name 소숫점 절사
  * @param {number} value
  * @param {number} decimal
  * @return {number}
