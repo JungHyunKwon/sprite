@@ -39,12 +39,12 @@ function compareNumbers(value) {
 }
 
 /**
- * @name 정수 확인
+ * @name 숫자 확인
  * @since 2017-12-06
  * @param {*} value
  * @return {boolean}
  */
-function isInt(value) {
+function isNumber(value) {
 	return typeof value === 'number' && !isNaN(value) && isFinite(value);
 }
 
@@ -58,12 +58,12 @@ function isInt(value) {
 function toFixed(value, decimal) {
 	let result = NaN;
 	
-	//값이 정수일 때
-	if(isInt(value)) {
+	//값이 숫자일 때
+	if(isNumber(value)) {
 		result = value;
 		
-		//소수가 정수일 때
-		if(isInt(decimal)) {
+		//소수가 숫자일 때
+		if(isNumber(decimal)) {
 			let splitValue = value.toString().split('.'),
 				splitValue1 = splitValue[1];
 			
@@ -99,8 +99,8 @@ function calcSprite(size, from, to, position) {
 		}
 	};
 
-	//좌표가 정수이면서 나미저 변수들이 정수이면서 0 초과일 때
-	if(isInt(size) && size > 0 && isInt(from) && from > 0 && isInt(to) && to > 0 && isInt(position)) {
+	//좌표가 숫자이면서 나미저 변수들이 숫자이면서 0 초과일 때
+	if(isNumber(size) && size > 0 && isNumber(from) && from > 0 && isNumber(to) && to > 0 && isNumber(position)) {
 		let ratio = from / to,
 			pixel = result.pixel,
 			pixelSize = size / ratio,
