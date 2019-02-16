@@ -116,207 +116,243 @@ function calcSprite(size, from, to, position) {
 	return result;
 }
 
-let spriteDirectory = [];
+fs.readdir(baseDirectory, (err, directories) => {
+	//오류가 있을 때
+	if(err) {
+		console.error(baseDirectory + '가 있는지 확인해주세요.');
+	}else{
+		let directoriesLength = directories.length;
 
-// ./images/sprite 폴더 조회
-try {
-	spriteDirectory = fs.readdirSync(baseDirectory);
-}catch(e) {
-	console.error(baseDirectory + '가 있는지 확인해주세요.');
-}
-
-let spriteDirectoryLength = spriteDirectory.length;
-
-(function loopSpriteDirectory(index) {
-	//조회된 파일, 폴더 수만큼 반복
-	if(spriteDirectoryLength > index) {
-		//폴더 이름
-		let directory = spriteDirectory[index],
-			directoryName = directory,
-			isError = false,
-			nextIndex = index + 1;
-		
-		//기본 디렉토리와 폴더명과 합성(./images/sprite/#)
-		directory = baseDirectory + '/' + directoryName;
-		
-		//폴더일 때
-		if(fs.statSync(directory).isDirectory()) {
-			//조회(./images/sprite/#/#.#)
-			let files = fs.readdirSync(directory),
-				filenames = [];
-			
-			//조회된 파일, 폴더 수 만큼 반복
-			files.forEach((value, idx, array) => {
-				let splitValue = value.split('.');
-
-				//폴더경로와 파일명 합성(./images/sprite/#.#)
-				value = directory + '/' + value;
+		(function loopDirectories(directoriesIndex) {
+			//조회된 파일, 폴더 개수만큼 반복
+			if(directoriesLength > directoriesIndex) {
+				let directory = directories[directoriesIndex],
+					directoryName = directory,
+					nextDirectoriesIndex = directoriesIndex + 1;
 				
-				//이미지 파일의 확장자를 가진 파일일 때 파일경로, 파일명 입력
-				if(fs.statSync(value).isFile() && imageExtensions.indexOf(splitValue[1])) {
-					files[idx] = value;
-					filenames.push(splitValue[0]);
-
-				//아니면 배열 files에서 제거
-				}else{
-					files.splice(idx, 1);
-				}
-			});
-			
-			//이미지 파일이 있을 때
-			if(files.length) {
-				//숫자 순으로 정렬
-				files = compareNumbers(files);
-				filenames = compareNumbers(filenames);
-
-				spriteSmith.run({
-					src : files,
-					padding : 10,
-					algorithm: 'top-down',
-					algorithmOpts : {
-					  sort : false
-					}
-				}, (error, result) => {
+				//기본 디렉토리와 폴더명과 합성(./images/sprite/#)
+				directory = baseDirectory + '/' + directoryName;
+				
+				fs.stat(directory, (err, stats) => {
 					//오류가 있을 때
-					if(error) {
-						console.error(error);
+					if(err) {
+						console.error(directory + '를 조회 할 수 없습니다.');
+						
+						loopDirectories(nextDirectoriesIndex);
+
+					//폴더일 때
+					}else if(stats.isDirectory()) {
+						fs.readdir(directory, (err, files) => {
+							//오류가 있을 때
+							if(err) {
+								console.error(directory + ' 목록을 읽을 수 없습니다.');
+								
+								loopDirectories(nextDirectoriesIndex);
+							}else{
+								let filesLength = files.length,		
+									imageFiles = [],
+									imageNames = [];
+
+								(function loopFiles(filesIndex) {
+									let nextFilesIndex = filesIndex + 1;
+
+									//파일 개수만큼 반복
+									if(filesLength > filesIndex) {
+										let file = files[filesIndex],
+											fileDirectory = directory + '/' + file,
+											splitFile = file.split('.');
+											
+										fs.stat(fileDirectory, (err, stats) => {
+											//오류가 있을 때
+											if(err) {
+												console.error(fileDirectory + '를 조회 할 수 없습니다.');
+											
+											//이미지 파일의 확장자를 가진 파일일 때
+											}else if(stats.isFile() && imageExtensions.indexOf(splitFile[1]) > -1) {
+												imageFiles.push(fileDirectory);
+												imageNames.push(splitFile[0]);
+											}
+
+											loopFiles(nextFilesIndex);
+										});
+									
+									//이미지 파일이 있을 때
+									}else if(imageFiles.length) {
+										//숫자 순으로 정렬
+										imageFiles = compareNumbers(imageFiles);
+										imageNames = compareNumbers(imageNames);
+
+										spriteSmith.run({
+											src : imageFiles,
+											padding : 10,
+											algorithm: 'top-down',
+											algorithmOpts : {
+											  sort : false
+											}
+										}, (err, result) => {
+											//오류가 있을 때
+											if(err) {
+												console.error(directory + '에 스프라이트 이미지 생성 중 오류가 발생했습니다.');
+
+												loopDirectories(nextDirectoriesIndex);
+											}else{
+												let distDirectory = directory + '/' + 'dist'; //폴더 경로와 dist 폴더명 합성(./images/sprite/#/dist)
+												
+												fs.stat(distDirectory, (err, stats) => {
+													//오류가 있을 때
+													if(err) {
+														fs.mkdir(distDirectory, (err) => {
+															//오류가 있을 때
+															if(err) {
+																console.error(distDirectory + '에 폴더를 생성하지 못했습니다.');
+
+																loopDirectories(nextDirectoriesIndex);
+															}else{
+																loopDirectories(directoriesIndex);
+															}
+														});
+													
+													//폴더일 때
+													}else if(stats.isDirectory()) {
+														let spriteName = directoryName + '_sprite',
+															saveDirectory = distDirectory + '/' + spriteName;
+
+														//png 파일 생성(./images/#/dist/)
+														fs.writeFile(saveDirectory + '.png', result.image, (err) => {
+															//오류가 있을 때
+															if(err) {
+																console.error(distDirectory + '에 스프라이트 이미지 파일을 생성하지 못했습니다.');
+
+																loopDirectories(nextDirectoriesIndex);
+															}else{
+																let coordinates = result.coordinates,
+																	properties = result.properties,
+																	imageWidth = properties.width,
+																	imageHeight = properties.height,
+																	pixelCode = '@charset "utf-8";\n',
+																	percentCode = '\n\n/* 가변 크기 */',
+																	counter = 0;
+
+																for(let i in coordinates) {
+																	let coordinatesI = coordinates[i],
+																		width = coordinatesI.width,
+																		height = coordinatesI.height,
+																		x = coordinatesI.x,
+																		y = coordinatesI.y,
+																		horizontalPercent = calcSprite(imageWidth, width, width, x).percent,
+																		horizontalPercentPosition = horizontalPercent.position,
+																		horizontalPercentSize = horizontalPercent.size,
+																		verticalPercent = calcSprite(imageHeight, height, height, y).percent,
+																		verticalPercentPosition = verticalPercent.position,
+																		verticalPercentSize = verticalPercent.size,
+																		imageName = imageNames[counter];
+																	
+																	//x 좌표값이 있을때
+																	if(x) {
+																		x = '-' + x + 'px';
+																	}else{
+																		x = 'left';
+																	}
+																	
+																	//y 좌표값이 있을때
+																	if(y) {
+																		y = '-' + y + 'px';
+																	}else{
+																		y = 'top';
+																	}
+																	
+																	let position = x + ' ' + y;
+
+																	//넓이값이 있을때
+																	if(width) {
+																		width += 'px';
+																	}
+																	
+																	//높이값이 있을때
+																	if(height) {
+																		height += 'px';
+																	}
+
+																	pixelCode += '\n.' + imageName + ' {width:' + width + '; height:' + height + '; background:url(\'' + (spriteName + '.png') + '\') no-repeat ' + position + ';}';
+																	
+																	//x 좌표값이 있을때
+																	if(horizontalPercentPosition) {
+																		horizontalPercentPosition = horizontalPercentPosition + '%';
+																	}else{
+																		horizontalPercentPosition = 'left';
+																	}
+																
+																	//y 좌표값이 있을때
+																	if(verticalPercentPosition) {
+																		verticalPercentPosition = verticalPercentPosition + '%';
+																	}else{
+																		verticalPercentPosition = 'top';
+																	}
+
+																	let percentPosition = horizontalPercentPosition + ' ' + verticalPercentPosition;
+
+																	//원본 위치와 퍼센트 위치와 같을 때
+																	if(position === percentPosition) {
+																		percentPosition = '';
+																	}else{
+																		percentPosition = 'background-position:' + percentPosition + '; ';
+																	}
+
+																	//가로 크기가 있을 때
+																	if(horizontalPercentSize) {
+																		horizontalPercentSize = horizontalPercentSize + '%';
+																	}
+																	
+																	//세로 크기가 있을 때
+																	if(verticalPercentSize) {
+																		verticalPercentSize = verticalPercentSize + '%';
+																	}
+
+																	percentCode += '\n.' + imageName + ' {' + percentPosition + 'background-size:' + horizontalPercentSize + ' ' + verticalPercentSize + ';}';
+
+																	counter++;
+																}
+
+																//css 파일 생성(./images/#/dist/)
+																fs.writeFile(saveDirectory + '.css', pixelCode + percentCode, (err) => {
+																	//오류가 있을 때
+																	if(err) {
+																		console.error(distDirectory + '에 css 파일을 생성하지 못했습니다.');
+																	}else{
+																		console.log(distDirectory + '에 생성하였습니다.');
+																	}
+
+																	//다음 반복 실행
+																	loopDirectories(nextDirectoriesIndex);
+																});
+
+															}
+														});
+													}else{
+														console.error(distDirectory + '가 폴더가 아닙니다.');
+
+														loopDirectories(nextDirectoriesIndex);
+													}
+												});
+											}
+										});
+									}else{
+										console.error(directory + '에 이미지 파일이 없습니다.');
+
+										loopDirectories(nextDirectoriesIndex);
+									}
+								})(0);
+							}
+						});
 					}else{
-						let coordinates = result.coordinates,
-							properties = result.properties,
-							spriteWidth = properties.width,
-							spriteHeight = properties.height,
-							distDirectory = directory + '/' + 'dist', //폴더 경로와 dist 폴더명 합성(./images/sprite/#/dist)
-							spriteName = directoryName + '_sprite',
-							saveDirectory = distDirectory + '/' + spriteName,
-							hasDistDirectory = false,
-							pixelCode = '@charset "utf-8";\n',
-							percentCode = '\n\n/* 가변 크기 */',
-							counter = 0;
-						
-						try {
-							//변수 distFolder가 폴더일 때
-							if(fs.statSync(distDirectory).isDirectory()) {
-								hasDistDirectory = true;
-							}
-						
-						//변수 distFolder에 dist 폴더가 없으면 오류 발생
-						}catch(e) {
-							//console.error(directory + '에 dist 폴더가 없습니다.');
-						}
-						
-						//dist 폴더가 없을 때 폴더 생성
-						if(!hasDistDirectory) {
-							fs.mkdirSync(distDirectory);
-							//console.log(distDirectory + '에 폴더를 생성하였습니다.');
-						}
-						
-						//png 파일 생성(./images/#/dist/)
-						fs.writeFileSync(saveDirectory + '.png', result.image);
+						console.error(directory + '가 폴더가 아닙니다.');
 
-						for(let i in coordinates) {
-							let coordinatesI = coordinates[i],
-								width = coordinatesI.width,
-								height = coordinatesI.height,
-								x = coordinatesI.x,
-								y = coordinatesI.y,
-								horizontalPercent = calcSprite(spriteWidth, width, width, x).percent,
-								horizontalPercentPosition = horizontalPercent.position,
-								horizontalPercentSize = horizontalPercent.size,
-								verticalPercent = calcSprite(spriteHeight, height, height, y).percent,
-								verticalPercentPosition = verticalPercent.position,
-								verticalPercentSize = verticalPercent.size,
-								filename = filenames[counter];
-							
-							//x 좌표값이 있을때
-							if(x) {
-								x = '-' + x + 'px';
-							}else{
-								x = 'left';
-							}
-							
-							//y 좌표값이 있을때
-							if(y) {
-								y = '-' + y + 'px';
-							}else{
-								y = 'top';
-							}
-							
-							let position = x + ' ' + y;
-
-							//넓이값이 있을때
-							if(width) {
-								width += 'px';
-							}
-							
-							//높이값이 있을때
-							if(height) {
-								height += 'px';
-							}
-
-							pixelCode += '\n.' + filename + ' {width:' + width + '; height:' + height + '; background:url(\'' + (spriteName + '.png') + '\') no-repeat ' + position + ';}';
-							
-							//x 좌표값이 있을때
-							if(horizontalPercentPosition) {
-								horizontalPercentPosition = horizontalPercentPosition + '%';
-							}else{
-								horizontalPercentPosition = 'left';
-							}
-						
-							//y 좌표값이 있을때
-							if(verticalPercentPosition) {
-								verticalPercentPosition = verticalPercentPosition + '%';
-							}else{
-								verticalPercentPosition = 'top';
-							}
-
-							let percentPosition = horizontalPercentPosition + ' ' + verticalPercentPosition;
-
-							//원본 위치와 퍼센트 위치와 같을 때
-							if(position === percentPosition) {
-								percentPosition = '';
-							}else{
-								percentPosition = 'background-position:' + percentPosition + '; ';
-							}
-
-							//가로 크기가 있을 때
-							if(horizontalPercentSize) {
-								horizontalPercentSize = horizontalPercentSize + '%';
-							}
-							
-							//세로 크기가 있을 때
-							if(verticalPercentSize) {
-								verticalPercentSize = verticalPercentSize + '%';
-							}
-							
-							let percentSize = horizontalPercentSize + ' ' + verticalPercentSize;
-
-							percentCode += '\n.' + filename + ' {' + percentPosition + 'background-size:' + percentSize + ';}';
-
-							counter++;
-						}
-
-						//css 파일 생성(./images/#/dist/)
-						fs.writeFileSync(saveDirectory + '.css', pixelCode + percentCode);
-
-						console.log(distDirectory + '에 생성하였습니다.');
+						loopDirectories(nextDirectoriesIndex);
 					}
-
-					//다음 반복 실행
-					loopSpriteDirectory(nextIndex);
 				});
 			}else{
-				console.error(directory + '에 이미지 파일이 없습니다.');
-				isError = true;
+				console.log('작업을 완료하였습니다.');
 			}
-		}else{
-			console.error(directory + '가 폴더가 아닙니다.');
-			isError = true;
-		}
-		
-		//오류가 있을 때
-		if(isError) {
-			//다음 반복 실행
-			loopSpriteDirectory(nextIndex);
-		}
+		})(0);
 	}
-})(0);
+});
