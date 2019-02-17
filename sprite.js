@@ -154,8 +154,6 @@ fs.readdir(baseDirectory, (err, directories) => {
 									imageNames = [];
 
 								(function loopFiles(filesIndex) {
-									let nextFilesIndex = filesIndex + 1;
-
 									//파일 개수만큼 반복
 									if(filesLength > filesIndex) {
 										let file = files[filesIndex],
@@ -173,7 +171,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 												imageNames.push(splitFile[0]);
 											}
 
-											loopFiles(nextFilesIndex);
+											loopFiles(filesIndex + 1);
 										});
 									
 									//이미지 파일이 있을 때
