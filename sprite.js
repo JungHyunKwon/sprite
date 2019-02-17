@@ -200,7 +200,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 
 												loopDirectories(nextDirectoriesIndex);
 											}else{
-												let distDirectory = directory + '/' + 'dist'; //폴더 경로와 dist 폴더명 합성(./images/sprite/#/dist)
+												let distDirectory = directory + '/dist'; //폴더 경로와 dist 폴더명 합성(./images/sprite/#/dist)
 												
 												fs.stat(distDirectory, (err, stats) => {
 													//오류가 있을 때
