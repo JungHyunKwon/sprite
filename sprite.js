@@ -158,15 +158,21 @@ fs.readdir(baseDirectory, (err, directories) => {
 									if(filesLength > filesIndex) {
 										let file = files[filesIndex],
 											fileDirectory = directory + '/' + file,
-											fileSplit = file.split('.');
-											
+											fileSplit = file.split('.'),
+											fileExtensions = fileSplit[1];
+										
+										//문자일 때
+										if(typeof fileExtensions === 'string') {
+											fileExtensions = fileExtensions.toLowerCase();
+										}
+
 										fs.stat(fileDirectory, (err, stats) => {
 											//오류가 있을 때
 											if(err) {
 												console.error(fileDirectory + '를 조회 할 수 없습니다.');
 											
 											//이미지 파일의 확장자를 가진 파일일 때
-											}else if(stats.isFile() && imageExtensions.indexOf(fileSplit[1]) > -1) {
+											}else if(stats.isFile() && imageExtensions.indexOf(fileExtensions) > -1) {
 												imageFiles.push(fileDirectory);
 												imageNames.push(fileSplit[0]);
 											}
