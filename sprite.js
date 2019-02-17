@@ -158,7 +158,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 									if(filesLength > filesIndex) {
 										let file = files[filesIndex],
 											fileDirectory = directory + '/' + file,
-											splitFile = file.split('.');
+											fileSplit = file.split('.');
 											
 										fs.stat(fileDirectory, (err, stats) => {
 											//오류가 있을 때
@@ -166,9 +166,9 @@ fs.readdir(baseDirectory, (err, directories) => {
 												console.error(fileDirectory + '를 조회 할 수 없습니다.');
 											
 											//이미지 파일의 확장자를 가진 파일일 때
-											}else if(stats.isFile() && imageExtensions.indexOf(splitFile[1]) > -1) {
+											}else if(stats.isFile() && imageExtensions.indexOf(fileSplit[1]) > -1) {
 												imageFiles.push(fileDirectory);
-												imageNames.push(splitFile[0]);
+												imageNames.push(fileSplit[0]);
 											}
 
 											loopFiles(filesIndex + 1);
