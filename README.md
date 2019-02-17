@@ -1,7 +1,7 @@
 # sprite v1.0.0
 NodeJS로 만들었으며 스프라이트 이미지 생성을 도와주는 도구입니다.
 
-## twolfson/spritesmith
+## twolfson
 <https://github.com/twolfson/spritesmith>
 
 ## CLI
