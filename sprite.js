@@ -24,7 +24,7 @@ function compareNumbers(value) {
 	if(Array.isArray(value)) {
 		let valueLength = value.length;
 
-		result = value.slice().sort(function(a, b) {
+		result = value.slice().sort((a, b) => {
 			a = a.split('/');
 			a = parseInt(a[a.length - 1].split('.')[0], 10) || valueLength;
 
@@ -64,13 +64,13 @@ function toFixed(value, decimal) {
 		
 		//소수가 숫자일 때
 		if(isNumber(decimal)) {
-			let splitValue = value.toString().split('.'),
-				splitValue1 = splitValue[1];
+			let valueSplit = value.toString().split('.'),
+				valueSplit1 = valueSplit[1];
 			
 			//소수점이 있을 때
-			if(splitValue1) {
-				splitValue[1] = splitValue1.substring(0, decimal);
-				result = parseFloat(splitValue.join('.'), 10);
+			if(valueSplit1) {
+				valueSplit[1] = valueSplit1.substring(0, decimal);
+				result = parseFloat(valueSplit.join('.'), 10);
 			}
 		}
 	}
