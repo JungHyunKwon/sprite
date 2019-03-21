@@ -44,7 +44,7 @@ function compareNumbers(value) {
  * @param {*} value
  * @return {boolean}
  */
-function isNumber(value) {
+function isNumeric(value) {
 	return typeof value === 'number' && !isNaN(value) && isFinite(value);
 }
 
@@ -59,18 +59,18 @@ function toFixed(value, decimal) {
 	let result = NaN;
 	
 	//값이 숫자일 때
-	if(isNumber(value)) {
+	if(isNumeric(value)) {
 		result = value;
 		
 		//소수가 숫자일 때
-		if(isNumber(decimal)) {
-			let valueSplit = value.toString().split('.'),
-				valueSplit1 = valueSplit[1];
+		if(isNumeric(decimal)) {
+			let splitValue = value.toString().split('.'),
+				splitValue1 = splitValue[1];
 			
 			//소수점이 있을 때
-			if(valueSplit1) {
-				valueSplit[1] = valueSplit1.substring(0, decimal);
-				result = parseFloat(valueSplit.join('.'), 10);
+			if(splitValue1) {
+				splitValue[1] = splitValue1.substring(0, decimal);
+				result = parseFloat(splitValue.join('.'), 10);
 			}
 		}
 	}
@@ -100,7 +100,7 @@ function calcSprite(size, from, to, position) {
 	};
 
 	//좌표가 숫자이면서 나미저 변수들이 숫자이면서 0 초과일 때
-	if(isNumber(size) && size > 0 && isNumber(from) && from > 0 && isNumber(to) && to > 0 && isNumber(position)) {
+	if(isNumeric(size) && size > 0 && isNumeric(from) && from > 0 && isNumeric(to) && to > 0 && isNumeric(position)) {
 		let ratio = from / to,
 			pixel = result.pixel,
 			pixelSize = size / ratio,
@@ -158,12 +158,12 @@ fs.readdir(baseDirectory, (err, directories) => {
 									if(filesLength > filesIndex) {
 										let file = files[filesIndex],
 											fileDirectory = directory + '/' + file,
-											fileSplit = file.split('.'),
-											fileExtensions = fileSplit[fileSplit.length - 1];
+											filename = file.split('.'),
+											fileExtension = filename[filename.length - 1];
 										
 										//문자일 때
-										if(typeof fileExtensions === 'string') {
-											fileExtensions = fileExtensions.toLowerCase();
+										if(typeof fileExtension === 'string') {
+											fileExtension = fileExtension.toLowerCase();
 										}
 
 										fs.stat(fileDirectory, (err, stats) => {
@@ -172,9 +172,9 @@ fs.readdir(baseDirectory, (err, directories) => {
 												console.error(fileDirectory + '를 조회 할 수 없습니다.');
 											
 											//이미지 파일의 확장자를 가진 파일일 때
-											}else if(stats.isFile() && imageExtensions.indexOf(fileExtensions) > -1) {
+											}else if(stats.isFile() && imageExtensions.indexOf(fileExtension) > -1) {
 												imageFiles.push(fileDirectory);
-												imageNames.push(fileSplit[0]);
+												imageNames.push(filename[0]);
 											}
 
 											loopFiles(filesIndex + 1);
