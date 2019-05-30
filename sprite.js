@@ -121,14 +121,14 @@ fs.readdir(baseDirectory, (err, directories) => {
 	if(err) {
 		console.error(baseDirectory + '가 있는지 확인해주세요.');
 	}else{
-		let directoriesLength = directories.length;
+		let directoryLength = directories.length;
 
-		(function loopDirectories(directoriesIndex) {
+		(function loopDirectories(directoryIndex) {
 			//조회된 파일, 폴더 개수만큼 반복
-			if(directoriesLength > directoriesIndex) {
-				let directory = directories[directoriesIndex],
+			if(directoryLength > directoryIndex) {
+				let directory = directories[directoryIndex],
 					directoryName = directory,
-					nextDirectoriesIndex = directoriesIndex + 1;
+					nextDirectoryIndex = directoryIndex + 1;
 				
 				//기본 디렉토리와 폴더명과 합성(./images/sprite/#)
 				directory = baseDirectory + '/' + directoryName;
@@ -138,7 +138,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 					if(err) {
 						console.error(directory + '를 조회 할 수 없습니다.');
 						
-						loopDirectories(nextDirectoriesIndex);
+						loopDirectories(nextDirectoryIndex);
 
 					//폴더일 때
 					}else if(stats.isDirectory()) {
@@ -147,23 +147,23 @@ fs.readdir(baseDirectory, (err, directories) => {
 							if(err) {
 								console.error(directory + ' 목록을 읽을 수 없습니다.');
 								
-								loopDirectories(nextDirectoriesIndex);
+								loopDirectories(nextDirectoryIndex);
 							}else{
-								let filesLength = files.length,		
+								let fileLength = files.length,		
 									imageFiles = [],
 									imageNames = [];
 
-								(function loopFiles(filesIndex) {
+								(function loopFiles(fileIndex) {
 									//파일 개수만큼 반복
-									if(filesLength > filesIndex) {
-										let file = files[filesIndex],
+									if(fileLength > fileIndex) {
+										let file = files[fileIndex],
 											fileDirectory = directory + '/' + file,
 											filename = file.split('.'),
-											fileExtension = filename[filename.length - 1];
+											fileExtensions = filename[filename.length - 1];
 										
 										//문자일 때
-										if(typeof fileExtension === 'string') {
-											fileExtension = fileExtension.toLowerCase();
+										if(typeof fileExtensions === 'string') {
+											fileExtensions = fileExtensions.toLowerCase();
 										}
 
 										fs.stat(fileDirectory, (err, stats) => {
@@ -172,12 +172,12 @@ fs.readdir(baseDirectory, (err, directories) => {
 												console.error(fileDirectory + '를 조회 할 수 없습니다.');
 											
 											//이미지 파일의 확장자를 가진 파일일 때
-											}else if(stats.isFile() && imageExtensions.indexOf(fileExtension) > -1) {
+											}else if(stats.isFile() && imageExtensions.indexOf(fileExtensions) > -1) {
 												imageFiles.push(fileDirectory);
 												imageNames.push(filename[0]);
 											}
 
-											loopFiles(filesIndex + 1);
+											loopFiles(fileIndex + 1);
 										});
 									
 									//이미지 파일이 있을 때
@@ -198,7 +198,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 											if(err) {
 												console.error(directory + '에 스프라이트 이미지 생성 중 오류가 발생했습니다.');
 
-												loopDirectories(nextDirectoriesIndex);
+												loopDirectories(nextDirectoryIndex);
 											}else{
 												let distDirectory = directory + '/dist'; //폴더 경로와 dist 폴더명 합성(./images/sprite/#/dist)
 												
@@ -210,9 +210,9 @@ fs.readdir(baseDirectory, (err, directories) => {
 															if(err) {
 																console.error(distDirectory + '에 폴더를 생성하지 못했습니다.');
 
-																loopDirectories(nextDirectoriesIndex);
+																loopDirectories(nextDirectoryIndex);
 															}else{
-																loopDirectories(directoriesIndex);
+																loopDirectories(directoryIndex);
 															}
 														});
 													
@@ -227,7 +227,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 															if(err) {
 																console.error(distDirectory + '에 스프라이트 이미지 파일을 생성하지 못했습니다.');
 
-																loopDirectories(nextDirectoriesIndex);
+																loopDirectories(nextDirectoryIndex);
 															}else{
 																let coordinates = result.coordinates,
 																	properties = result.properties,
@@ -238,11 +238,11 @@ fs.readdir(baseDirectory, (err, directories) => {
 																	counter = 0;
 
 																for(let i in coordinates) {
-																	let coordinatesI = coordinates[i],
-																		width = coordinatesI.width,
-																		height = coordinatesI.height,
-																		x = coordinatesI.x,
-																		y = coordinatesI.y,
+																	let info = coordinates[i],
+																		width = info.width,
+																		height = info.height,
+																		x = info.x,
+																		y = info.y,
 																		horizontalPercent = calcSprite(imageWidth, width, width, x).percent,
 																		horizontalPercentPosition = horizontalPercent.position,
 																		horizontalPercentSize = horizontalPercent.size,
@@ -327,7 +327,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 																	}
 
 																	//다음 반복 실행
-																	loopDirectories(nextDirectoriesIndex);
+																	loopDirectories(nextDirectoryIndex);
 																});
 
 															}
@@ -335,7 +335,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 													}else{
 														console.error(distDirectory + '가 폴더가 아닙니다.');
 
-														loopDirectories(nextDirectoriesIndex);
+														loopDirectories(nextDirectoryIndex);
 													}
 												});
 											}
@@ -343,7 +343,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 									}else{
 										console.error(directory + '에 이미지 파일이 없습니다.');
 
-										loopDirectories(nextDirectoriesIndex);
+										loopDirectories(nextDirectoryIndex);
 									}
 								})(0);
 							}
@@ -351,7 +351,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 					}else{
 						console.error(directory + '가 폴더가 아닙니다.');
 
-						loopDirectories(nextDirectoriesIndex);
+						loopDirectories(nextDirectoryIndex);
 					}
 				});
 			}else{
