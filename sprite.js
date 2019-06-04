@@ -9,7 +9,7 @@
 const fs = require('fs'),
 	  spriteSmith = require('spritesmith'), // {@link https://github.com/twolfson/spritesmith}
 	  baseDirectory = './images/sprite',
-	  imageExtensions = ['gif', 'png', 'jpg', 'jpeg'];
+	  imageExtensions = ['gif', 'png', 'jpg'];
 
 /**
  * @name 숫자 비교
@@ -18,24 +18,13 @@ const fs = require('fs'),
  * @since 2018-07-13
  */
 function compareNumbers(value) {
-	let result = [];
-	
-	//배열일 때
-	if(Array.isArray(value)) {
-		let valueLength = value.length;
+	return value.filter((element, index, array) => {
+		element = element.split('/');
 
-		result = value.slice().sort((a, b) => {
-			a = a.split('/');
-			a = parseInt(a[a.length - 1].split('.')[0], 10) || valueLength;
-
-			b = b.split('/');
-			b = parseInt(b[b.length - 1].split('.')[0], 10) || valueLength;
-
-			return a - b;
-		});
-	}
-
-	return result;
+		return(isNaN(element[element.length - 1].split('.')[0])) ? false : true;
+	}).sort((a, b) => {
+		return a - b;
+	});
 }
 
 /**
@@ -57,7 +46,7 @@ function isNumeric(value) {
  */
 function toFixed(value, decimal) {
 	let result = NaN;
-	
+
 	//값이 숫자일 때
 	if(isNumeric(value)) {
 		result = value;
@@ -65,11 +54,11 @@ function toFixed(value, decimal) {
 		//소수가 숫자일 때
 		if(isNumeric(decimal)) {
 			let splitValue = value.toString().split('.'),
-				splitValue1 = splitValue[1];
+				firstOfSplitValue = splitValue[1];
 			
 			//소수점이 있을 때
-			if(splitValue1) {
-				splitValue[1] = splitValue1.substring(0, decimal);
+			if(firstOfSplitValue) {
+				splitValue[1] = firstOfSplitValue.substring(0, decimal);
 				result = parseFloat(splitValue.join('.'), 10);
 			}
 		}
@@ -123,12 +112,12 @@ fs.readdir(baseDirectory, (err, directories) => {
 	}else{
 		let directoryLength = directories.length;
 
-		(function loopDirectories(directoryIndex) {
+		(function loopDirectories(directoriesIndex) {
 			//조회된 파일, 폴더 개수만큼 반복
-			if(directoryLength > directoryIndex) {
-				let directory = directories[directoryIndex],
+			if(directoryLength > directoriesIndex) {
+				let directory = directories[directoriesIndex],
 					directoryName = directory,
-					nextDirectoryIndex = directoryIndex + 1;
+					nextDirectoriesIndex = directoriesIndex + 1;
 				
 				//기본 디렉토리와 폴더명과 합성(./images/sprite/#)
 				directory = baseDirectory + '/' + directoryName;
@@ -138,7 +127,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 					if(err) {
 						console.error(directory + '를 조회 할 수 없습니다.');
 						
-						loopDirectories(nextDirectoryIndex);
+						loopDirectories(nextDirectoriesIndex);
 
 					//폴더일 때
 					}else if(stats.isDirectory()) {
@@ -147,16 +136,16 @@ fs.readdir(baseDirectory, (err, directories) => {
 							if(err) {
 								console.error(directory + ' 목록을 읽을 수 없습니다.');
 								
-								loopDirectories(nextDirectoryIndex);
+								loopDirectories(nextDirectoriesIndex);
 							}else{
-								let fileLength = files.length,		
+								let filesLength = files.length,		
 									imageFiles = [],
 									imageNames = [];
 
-								(function loopFiles(fileIndex) {
+								(function loopFiles(filesIndex) {
 									//파일 개수만큼 반복
-									if(fileLength > fileIndex) {
-										let file = files[fileIndex],
+									if(filesLength > filesIndex) {
+										let file = files[filesIndex],
 											fileDirectory = directory + '/' + file,
 											filename = file.split('.'),
 											fileExtensions = filename[filename.length - 1];
@@ -177,7 +166,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 												imageNames.push(filename[0]);
 											}
 
-											loopFiles(fileIndex + 1);
+											loopFiles(filesIndex + 1);
 										});
 									
 									//이미지 파일이 있을 때
@@ -198,7 +187,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 											if(err) {
 												console.error(directory + '에 스프라이트 이미지 생성 중 오류가 발생했습니다.');
 
-												loopDirectories(nextDirectoryIndex);
+												loopDirectories(nextDirectoriesIndex);
 											}else{
 												let distDirectory = directory + '/dist'; //폴더 경로와 dist 폴더명 합성(./images/sprite/#/dist)
 												
@@ -210,9 +199,9 @@ fs.readdir(baseDirectory, (err, directories) => {
 															if(err) {
 																console.error(distDirectory + '에 폴더를 생성하지 못했습니다.');
 
-																loopDirectories(nextDirectoryIndex);
+																loopDirectories(nextDirectoriesIndex);
 															}else{
-																loopDirectories(directoryIndex);
+																loopDirectories(directoriesIndex);
 															}
 														});
 													
@@ -227,7 +216,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 															if(err) {
 																console.error(distDirectory + '에 스프라이트 이미지 파일을 생성하지 못했습니다.');
 
-																loopDirectories(nextDirectoryIndex);
+																loopDirectories(nextDirectoriesIndex);
 															}else{
 																let coordinates = result.coordinates,
 																	properties = result.properties,
@@ -327,7 +316,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 																	}
 
 																	//다음 반복 실행
-																	loopDirectories(nextDirectoryIndex);
+																	loopDirectories(nextDirectoriesIndex);
 																});
 
 															}
@@ -335,7 +324,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 													}else{
 														console.error(distDirectory + '가 폴더가 아닙니다.');
 
-														loopDirectories(nextDirectoryIndex);
+														loopDirectories(nextDirectoriesIndex);
 													}
 												});
 											}
@@ -343,7 +332,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 									}else{
 										console.error(directory + '에 이미지 파일이 없습니다.');
 
-										loopDirectories(nextDirectoryIndex);
+										loopDirectories(nextDirectoriesIndex);
 									}
 								})(0);
 							}
@@ -351,7 +340,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 					}else{
 						console.error(directory + '가 폴더가 아닙니다.');
 
-						loopDirectories(nextDirectoryIndex);
+						loopDirectories(nextDirectoriesIndex);
 					}
 				});
 			}else{
