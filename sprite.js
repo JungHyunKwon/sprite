@@ -147,8 +147,8 @@ fs.readdir(baseDirectory, (err, directories) => {
 									if(filesLength > filesIndex) {
 										let file = files[filesIndex],
 											fileDirectory = directory + '/' + file,
-											filename = file.split('.'),
-											fileExtensions = filename[filename.length - 1];
+											fileName = file.split('.'),
+											fileExtensions = fileName[fileName.length - 1];
 										
 										//문자일 때
 										if(typeof fileExtensions === 'string') {
@@ -163,7 +163,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 											//이미지 파일의 확장자를 가진 파일일 때
 											}else if(stats.isFile() && imageExtensions.indexOf(fileExtensions) > -1) {
 												imageFiles.push(fileDirectory);
-												imageNames.push(filename[0]);
+												imageNames.push(fileName[0]);
 											}
 
 											loopFiles(filesIndex + 1);
