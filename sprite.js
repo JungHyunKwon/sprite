@@ -12,12 +12,12 @@ const fs = require('fs'),
 	  imageExtensions = ['gif', 'png', 'jpg'];
 
 /**
- * @name 숫자 비교
+ * @name 숫자 정렬
  * @param {array} value
  * @return {array}
  * @since 2018-07-13
  */
-function compareNumbers(value) {
+function sortNumeric(value) {
 	return value.filter((element, index, array) => {
 		element = element.split('/');
 
@@ -172,8 +172,8 @@ fs.readdir(baseDirectory, (err, directories) => {
 									//이미지 파일이 있을 때
 									}else if(imageFiles.length) {
 										//숫자 순으로 정렬
-										imageFiles = compareNumbers(imageFiles);
-										imageNames = compareNumbers(imageNames);
+										imageFiles = sortNumeric(imageFiles);
+										imageNames = sortNumeric(imageNames);
 
 										spriteSmith.run({
 											src : imageFiles,
@@ -194,7 +194,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 												fs.stat(distDirectory, (err, stats) => {
 													//오류가 있을 때
 													if(err) {
-														fs.mkdir(distDirectory, (err) => {
+														fs.mkdir(distDirectory, err => {
 															//오류가 있을 때
 															if(err) {
 																console.error(distDirectory + '에 폴더를 생성하지 못했습니다.');
@@ -211,7 +211,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 															saveDirectory = distDirectory + '/' + spriteName;
 
 														//png 파일 생성(./images/#/dist/)
-														fs.writeFile(saveDirectory + '.png', result.image, (err) => {
+														fs.writeFile(saveDirectory + '.png', result.image, err => {
 															//오류가 있을 때
 															if(err) {
 																console.error(distDirectory + '에 스프라이트 이미지 파일을 생성하지 못했습니다.');
@@ -307,7 +307,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 																}
 
 																//css 파일 생성(./images/#/dist/)
-																fs.writeFile(saveDirectory + '.css', pixelCode + percentCode, (err) => {
+																fs.writeFile(saveDirectory + '.css', pixelCode + percentCode, err => {
 																	//오류가 있을 때
 																	if(err) {
 																		console.error(distDirectory + '에 css 파일을 생성하지 못했습니다.');
