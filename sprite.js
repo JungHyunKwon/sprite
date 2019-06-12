@@ -149,7 +149,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 										let file = files[filesIndex],
 											fileDirectory = directory + '/' + file,
 											fileName = file.split('.'),
-											fileExtensions = fileName[fileName.length - 1];
+											fileExtensions = fileName[fileName.length - 1].toLowerCase();
 										
 										//문자일 때
 										if(typeof fileExtensions === 'string') {
