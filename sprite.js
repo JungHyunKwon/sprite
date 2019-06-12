@@ -17,7 +17,7 @@ const fs = require('fs'),
  * @return {array}
  * @since 2018-07-13
  */
-function sortNumeric(value) {
+function sortNumber(value) {
 	return value.filter((element, index, array) => {
 		element = element.split('/');
 
@@ -116,13 +116,14 @@ fs.readdir(baseDirectory, (err, directories) => {
 			//조회된 파일, 폴더 개수만큼 반복
 			if(directoryLength > directoriesIndex) {
 				let directory = directories[directoriesIndex],
-					directoryName = directory,
-					nextDirectoriesIndex = directoriesIndex + 1;
+					directoryName = directory;
 				
 				//기본 디렉토리와 폴더명과 합성(./images/sprite/#)
 				directory = baseDirectory + '/' + directoryName;
 				
 				fs.stat(directory, (err, stats) => {
+					let nextDirectoriesIndex = directoriesIndex + 1;
+
 					//오류가 있을 때
 					if(err) {
 						console.error(directory + '를 조회 할 수 없습니다.');
@@ -172,8 +173,8 @@ fs.readdir(baseDirectory, (err, directories) => {
 									//이미지 파일이 있을 때
 									}else if(imageFiles.length) {
 										//숫자 순으로 정렬
-										imageFiles = sortNumeric(imageFiles);
-										imageNames = sortNumeric(imageNames);
+										imageFiles = sortNumber(imageFiles);
+										imageNames = sortNumber(imageNames);
 
 										spriteSmith.run({
 											src : imageFiles,
@@ -227,11 +228,11 @@ fs.readdir(baseDirectory, (err, directories) => {
 																	counter = 0;
 
 																for(let i in coordinates) {
-																	let info = coordinates[i],
-																		width = info.width,
-																		height = info.height,
-																		x = info.x,
-																		y = info.y,
+																	let coordinate = coordinates[i],
+																		width = coordinate.width,
+																		height = coordinate.height,
+																		x = coordinate.x,
+																		y = coordinate.y,
 																		horizontalPercent = calcSprite(imageWidth, width, width, x).percent,
 																		horizontalPercentPosition = horizontalPercent.position,
 																		horizontalPercentSize = horizontalPercent.size,
