@@ -23,7 +23,10 @@ function sortNumber(value) {
 
 		return(isNaN(element[element.length - 1].split('.')[0])) ? false : true;
 	}).sort((a, b) => {
-		return a - b;
+		a = a.split('/');
+		b = b.split('/');
+
+		return a[a.length - 1].split('.')[0] - b[b.length - 1].split('.')[0];
 	});
 }
 
