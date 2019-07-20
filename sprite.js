@@ -57,11 +57,11 @@ function toFixed(value, decimal) {
 		//소수가 숫자일 때
 		if(isNumeric(decimal)) {
 			let splitValue = value.toString().split('.'),
-				firstOfSplitValue = splitValue[1];
+				firstSplitValue = splitValue[1];
 			
 			//소수점이 있을 때
-			if(firstOfSplitValue) {
-				splitValue[1] = firstOfSplitValue.substring(0, decimal);
+			if(firstSplitValue) {
+				splitValue[1] = firstSplitValue.substring(0, decimal);
 				result = parseFloat(splitValue.join('.'), 10);
 			}
 		}
@@ -150,24 +150,29 @@ fs.readdir(baseDirectory, (err, directories) => {
 									//파일 개수만큼 반복
 									if(filesLength > filesIndex) {
 										let file = files[filesIndex],
-											fileDirectory = directory + '/' + file,
 											fileName = file.split('.'),
 											fileExtensions = fileName[fileName.length - 1].toLowerCase();
 										
+										fileName.pop();
+
+										fileName = fileName.join('');
+
+										file = directory + '/' + file;
+
 										//문자일 때
 										if(typeof fileExtensions === 'string') {
 											fileExtensions = fileExtensions.toLowerCase();
 										}
 
-										fs.stat(fileDirectory, (err, stats) => {
+										fs.stat(file, (err, stats) => {
 											//오류가 있을 때
 											if(err) {
-												console.error(fileDirectory + '를 조회 할 수 없습니다.');
+												console.error(file + '를 조회 할 수 없습니다.');
 											
 											//이미지 파일의 확장자를 가진 파일일 때
 											}else if(stats.isFile() && imageExtensions.indexOf(fileExtensions) > -1) {
 												imageFiles.push(fileDirectory);
-												imageNames.push(fileName[0]);
+												imageNames.push(fileName);
 											}
 
 											loopFiles(filesIndex + 1);
