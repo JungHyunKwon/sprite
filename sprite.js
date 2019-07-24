@@ -7,9 +7,10 @@
 'use strict';
 
 const fs = require('fs'),
+	  path = require('path'),
 	  spriteSmith = require('spritesmith'), // {@link https://github.com/twolfson/spritesmith}
 	  baseDirectory = './images/sprite',
-	  imageExtensions = ['gif', 'png', 'jpg'];
+	  imageExtensions = ['.gif', '.png', '.jpg'];
 
 /**
  * @name 숫자 정렬
@@ -150,19 +151,11 @@ fs.readdir(baseDirectory, (err, directories) => {
 									//파일 개수만큼 반복
 									if(filesLength > filesIndex) {
 										let file = files[filesIndex],
-											fileName = file.split('.'),
-											fileExtensions = fileName[fileName.length - 1].toLowerCase();
-										
-										fileName.pop();
-
-										fileName = fileName.join('');
+											parsedFile = path.parse(file),
+											fileName = parsedFile.name,
+											fileExtensions = parsedFile.ext.toLowerCase();
 
 										file = directory + '/' + file;
-
-										//문자일 때
-										if(typeof fileExtensions === 'string') {
-											fileExtensions = fileExtensions.toLowerCase();
-										}
 
 										fs.stat(file, (err, stats) => {
 											//오류가 있을 때
@@ -171,7 +164,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 											
 											//이미지 파일의 확장자를 가진 파일일 때
 											}else if(stats.isFile() && imageExtensions.indexOf(fileExtensions) > -1) {
-												imageFiles.push(fileDirectory);
+												imageFiles.push(file);
 												imageNames.push(fileName);
 											}
 
@@ -248,7 +241,7 @@ fs.readdir(baseDirectory, (err, directories) => {
 																		verticalPercentPosition = verticalPercent.position,
 																		verticalPercentSize = verticalPercent.size,
 																		imageName = imageNames[counter];
-																	
+
 																	//x 좌표값이 있을때
 																	if(x) {
 																		x = '-' + x + 'px';
