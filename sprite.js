@@ -57,13 +57,13 @@ function toFixed(value, decimal) {
 		
 		//소수가 숫자일 때
 		if(isNumeric(decimal)) {
-			let splitValue = value.toString().split('.'),
-				firstSplitValue = splitValue[1];
+			let split = value.toString().split('.'),
+				firstSplit = split[1];
 			
 			//소수점이 있을 때
-			if(firstSplitValue) {
-				splitValue[1] = firstSplitValue.substring(0, decimal);
-				result = parseFloat(splitValue.join('.'), 10);
+			if(firstSplit) {
+				split[1] = firstSplit.substring(0, decimal);
+				result = parseFloat(split.join('.'), 10);
 			}
 		}
 	}
