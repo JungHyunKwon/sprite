@@ -63,7 +63,8 @@ function toFixed(value, decimal) {
 			//소수점이 있을 때
 			if(firstSplit) {
 				split[1] = firstSplit.substring(0, decimal);
-				result = parseFloat(split.join('.'), 10);
+
+				result = parseFloat(split.join('.'));
 			}
 		}
 	}
